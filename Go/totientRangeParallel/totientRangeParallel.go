@@ -97,7 +97,7 @@ func sumTotient(lower, upper, cores int64) int64 {
 	wg.Wait()
 	close(ch)
 
-	for value := range ch {
+	for value := range ch { // potentially change this so that summing happens as soon as one thread finishes
 		sum += value
 	}
 	return sum
