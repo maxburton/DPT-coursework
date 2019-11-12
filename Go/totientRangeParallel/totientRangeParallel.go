@@ -16,7 +16,6 @@ package main
 
 import (
 	"fmt"
-	"math"
 	"os"
 	"strconv"
 	"sync"
@@ -54,7 +53,7 @@ func relprime(x, y int64) bool {
 func euler(lower int64, upper int64, ch chan int64, wg *sync.WaitGroup) {
 	var length, i, j int64
 
-	for i = lower; i <= upper; i++ {
+	for i = lower; i < upper; i++ {
 		length = 0
 		for j = 1; j < i; j++ {
 			if relprime(i, j) {
@@ -71,20 +70,28 @@ func euler(lower int64, upper int64, ch chan int64, wg *sync.WaitGroup) {
 //
 // sumTotient lower upper = sum (map euler [lower, lower+1 .. upper])
 
-func sumTotient(lower, upper int64) int64 {
+func sumTotient(lower, upper, cores int64) int64 {
 	var sum, i int64
 	ch := make(chan int64, 100000)
 	sum = 0
 
 	totalRange := upper - lower
-	var goroutines int64 = 64
+	var goroutines int64 = cores
 	chunkSize := totalRange / goroutines // floor division
 	var wg sync.WaitGroup                // using a waitgroup to close the channel after all threads are completed
 
 	for i = 0; i < goroutines; i++ {
 		wg.Add(1)
-		elower := lower + int64(math.Round((float64(totalRange) / float64(goroutines) * float64(i))))
-		eupper := lower + int64(math.Round((float64(totalRange) / float64(goroutines) * (float64(i) + 1))))
+
+		elower := lower + (chunkSize * i)
+
+		var eupper int64
+		if i+1 == goroutines {
+			eupper = upper
+		} else {
+			eupper = lower + (chunkSize * (i + 1))
+		}
+
 		go euler(elower, eupper, ch, &wg) // round numbers, doesnt work perfectly as is on imperfect division
 	}
 	wg.Wait()
@@ -97,7 +104,7 @@ func sumTotient(lower, upper int64) int64 {
 }
 
 func main() {
-	var lower, upper int64
+	var lower, upper, cores int64
 	var err error
 	// Read and validate lower and upper arguments
 	if len(os.Args) < 3 {
@@ -110,10 +117,13 @@ func main() {
 	if upper, err = strconv.ParseInt(os.Args[2], 10, 64); err != nil {
 		panic(fmt.Sprintf("Can't parse second argument"))
 	}
+	if cores, err = strconv.ParseInt(os.Args[3], 10, 64); err != nil {
+		panic(fmt.Sprintf("Can't parse third argument"))
+	}
 	// Record start time
 	start := time.Now()
 	// Compute and output sum of totients
-	fmt.Println("Sum of Totients between", lower, "and", upper, "is", sumTotient(lower, upper))
+	fmt.Println("Sum of Totients between", lower, "and", upper, "is", sumTotient(lower, upper, cores))
 
 	// Record the elapsed time
 	t := time.Now()
