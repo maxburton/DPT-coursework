@@ -1,0 +1,79 @@
+dataset,threads,time,output
+DS1,sequential,Elapsed time: 15.222714s,C: Sum of Totients  between [1..15000] is 68394315
+DS1,sequential,Elapsed time: 15.219649s,C: Sum of Totients  between [1..15000] is 68394315
+DS1,sequential,Elapsed time: 15.522108s,C: Sum of Totients  between [1..15000] is 68394315
+DS1,1,15180,C: Sum of Totients  between [1..15000] is 68394315
+DS1,1,15182,C: Sum of Totients  between [1..15000] is 68394315
+DS1,1,15175,C: Sum of Totients  between [1..15000] is 68394315
+DS1,2,11694,C: Sum of Totients  between [1..15000] is 68394315
+DS1,2,11668,C: Sum of Totients  between [1..15000] is 68394315
+DS1,2,11654,C: Sum of Totients  between [1..15000] is 68394315
+DS1,4,7032,C: Sum of Totients  between [1..15000] is 68394315
+DS1,4,7009,C: Sum of Totients  between [1..15000] is 68394315
+DS1,4,7022,C: Sum of Totients  between [1..15000] is 68394315
+DS1,8,3900,C: Sum of Totients  between [1..15000] is 68394315
+DS1,8,3911,C: Sum of Totients  between [1..15000] is 68394315
+DS1,8,3899,C: Sum of Totients  between [1..15000] is 68394315
+DS1,12,2741,C: Sum of Totients  between [1..15000] is 68394315
+DS1,12,2700,C: Sum of Totients  between [1..15000] is 68394315
+DS1,12,2688,C: Sum of Totients  between [1..15000] is 68394315
+DS1,16,2079,C: Sum of Totients  between [1..15000] is 68394315
+DS1,16,2279,C: Sum of Totients  between [1..15000] is 68394315
+DS1,16,2100,C: Sum of Totients  between [1..15000] is 68394315
+DS1,24,1429,C: Sum of Totients  between [1..15000] is 68394315
+DS1,24,1509,C: Sum of Totients  between [1..15000] is 68394315
+DS1,24,1432,C: Sum of Totients  between [1..15000] is 68394315
+DS1,32,1110,C: Sum of Totients  between [1..15000] is 68394315
+DS1,32,1076,C: Sum of Totients  between [1..15000] is 68394315
+DS1,32,1164,C: Sum of Totients  between [1..15000] is 68394315
+DS1,48,873,C: Sum of Totients  between [1..15000] is 68394315
+DS1,48,898,C: Sum of Totients  between [1..15000] is 68394315
+DS1,48,938,C: Sum of Totients  between [1..15000] is 68394315
+DS1,64,842,C: Sum of Totients  between [1..15000] is 68394315
+DS1,64,811,C: Sum of Totients  between [1..15000] is 68394315
+DS1,64,822,C: Sum of Totients  between [1..15000] is 68394315
+DS2,sequential,Elapsed time: 65.678625s,C: Sum of Totients  between [1..30000] is 273571773
+DS2,sequential,Elapsed time: 65.688663s,C: Sum of Totients  between [1..30000] is 273571773
+DS2,sequential,Elapsed time: 67.366016s,C: Sum of Totients  between [1..30000] is 273571773
+DS2,1,65779,C: Sum of Totients  between [1..30000] is 273571773
+DS2,1,71705,C: Sum of Totients  between [1..30000] is 273571773
+DS2,1,71807,C: Sum of Totients  between [1..30000] is 273571773
+DS2,2,57769,C: Sum of Totients  between [1..30000] is 273571773
+DS2,2,53671,C: Sum of Totients  between [1..30000] is 273571773
+DS2,2,55978,C: Sum of Totients  between [1..30000] is 273571773
+DS2,4,35904,C: Sum of Totients  between [1..30000] is 273571773
+DS2,4,31284,C: Sum of Totients  between [1..30000] is 273571773
+DS2,4,30583,C: Sum of Totients  between [1..30000] is 273571773
+DS2,8,16717,C: Sum of Totients  between [1..30000] is 273571773
+DS2,8,16624,C: Sum of Totients  between [1..30000] is 273571773
+DS2,8,16716,C: Sum of Totients  between [1..30000] is 273571773
+DS2,12,11532,C: Sum of Totients  between [1..30000] is 273571773
+DS2,12,11547,C: Sum of Totients  between [1..30000] is 273571773
+DS2,12,11552,C: Sum of Totients  between [1..30000] is 273571773
+DS2,16,8859,C: Sum of Totients  between [1..30000] is 273571773
+DS2,16,8822,C: Sum of Totients  between [1..30000] is 273571773
+DS2,16,8817,C: Sum of Totients  between [1..30000] is 273571773
+DS2,24,6179,C: Sum of Totients  between [1..30000] is 273571773
+DS2,24,6334,C: Sum of Totients  between [1..30000] is 273571773
+DS2,24,6185,C: Sum of Totients  between [1..30000] is 273571773
+DS2,32,4692,C: Sum of Totients  between [1..30000] is 273571773
+DS2,32,4983,C: Sum of Totients  between [1..30000] is 273571773
+DS2,32,4855,C: Sum of Totients  between [1..30000] is 273571773
+DS2,48,3785,C: Sum of Totients  between [1..30000] is 273571773
+DS2,48,3966,C: Sum of Totients  between [1..30000] is 273571773
+DS2,48,3837,C: Sum of Totients  between [1..30000] is 273571773
+DS2,64,3429,C: Sum of Totients  between [1..30000] is 273571773
+DS2,64,3280,C: Sum of Totients  between [1..30000] is 273571773
+DS2,64,3497,C: Sum of Totients  between [1..30000] is 273571773
+DS3,8,70287,C: Sum of Totients  between [1..60000] is 1094277505
+DS3,8,71061,C: Sum of Totients  between [1..60000] is 1094277505
+DS3,8,70478,C: Sum of Totients  between [1..60000] is 1094277505
+DS3,16,37504,C: Sum of Totients  between [1..60000] is 1094277505
+DS3,16,37474,C: Sum of Totients  between [1..60000] is 1094277505
+DS3,16,37519,C: Sum of Totients  between [1..60000] is 1094277505
+DS3,32,19881,C: Sum of Totients  between [1..60000] is 1094277505
+DS3,32,20811,C: Sum of Totients  between [1..60000] is 1094277505
+DS3,32,21004,C: Sum of Totients  between [1..60000] is 1094277505
+DS3,64,14874,C: Sum of Totients  between [1..60000] is 1094277505
+DS3,64,14783,C: Sum of Totients  between [1..60000] is 1094277505
+DS3,64,14144,C: Sum of Totients  between [1..60000] is 1094277505

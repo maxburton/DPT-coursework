@@ -70,17 +70,19 @@ long sumTotient(long lower, long upper, int n_threads)
 int main(int argc, char ** argv)
 {
   long lower, upper;
-  int num_threads;
-  unsigned long msec;
+  int num_threads = omp_get_num_threads();
+  float msec;
   struct timeval start, stop;
 
-  if (argc != 4) {
-    printf("not 3 arguments\n");
+  if (argc < 3) {
+    printf("fewer than 2 arguments\n");
     return 1;
   }
   sscanf(argv[1], "%ld", &lower);
   sscanf(argv[2], "%ld", &upper);
-  sscanf(argv[3], "%d", &num_threads);
+  if (argc == 4){
+    sscanf(argv[3], "%d", &num_threads);
+  }
 
   gettimeofday(&start, NULL);	
   printf("C: Sum of Totients  between [%ld..%ld] is %ld\n",
@@ -93,6 +95,6 @@ int main(int argc, char ** argv)
   msec = 1000 * (stop.tv_sec - start.tv_sec) +
                 (stop.tv_usec - start.tv_usec) / 1000;
 
-  printf("Elapsed time: %ldms\n", msec);
+  printf("%f\n", msec);  // Rename to elapsed time:
   return 0;
 }
