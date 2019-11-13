@@ -46,6 +46,20 @@ func relprime(x, y int64) bool {
 	return hcf(x, y) == 1
 }
 
+// sequential euler function
+
+func euler_seq(n int64) int64 {
+	var length, i int64
+
+	length = 0
+	for i = 1; i < n; i++ {
+		if relprime(n, i) {
+			length++
+		}
+	}
+	return length
+}
+
 // euler(n) computes the Euler totient function, i.e. counts the number of
 // positive integers up to n that are relatively prime to n
 //
@@ -71,28 +85,38 @@ func euler(value int64, ch chan int64, wg *sync.WaitGroup) {
 
 func sumTotient(lower, upper, cores int64) int64 {
 	var sum, i int64
-	chIn := make(chan int64, 100000)
-	chSum := make(chan int64, 100000)
 	sum = 0
 
-	var goroutines int64 = cores
-	runtime.GOMAXPROCS(int(goroutines))
-	var wg sync.WaitGroup // using a waitgroup to close the channel after all threads are completed
+	// If more than 1 core is being used, utilise parallelism, otherwise run sequentially (with 1 core in this program, sequential is faster)
+	if cores > 1 {
+		chIn := make(chan int64, 100000)
+		chSum := make(chan int64, 100000)
+		var goroutines int64 = cores
+		runtime.GOMAXPROCS(int(goroutines))
+		var wg sync.WaitGroup // using a waitgroup to close the channel after all threads are completed
 
-	for i = 0; i <= upper; i++ {
-		chIn <- i
-	}
-	close(chIn)
+		// add all numbers in range of lower and upper to a channel
+		for i = lower; i <= upper; i++ {
+			chIn <- i
+		}
+		close(chIn)
 
-	for value := range chIn {
-		wg.Add(1)
-		go euler(value, chSum, &wg)
-	}
-	wg.Wait()
-	close(chSum)
+		// repeatedly spawn goroutines to take 1 entry in chIn and calculate its totient, which is then sent onto channel chSum
+		for value := range chIn {
+			wg.Add(1)
+			go euler(value, chSum, &wg)
+		}
+		wg.Wait()
+		close(chSum)
 
-	for value := range chSum {
-		sum += value
+		// sum all values in channel chSum
+		for value := range chSum {
+			sum += value
+		}
+	} else {
+		for i = lower; i <= upper; i++ {
+			sum = sum + euler_seq(i)
+		}
 	}
 	return sum
 }
@@ -102,7 +126,7 @@ func main() {
 	var err error
 	// Read and validate lower and upper arguments
 	if len(os.Args) < 3 {
-		panic(fmt.Sprintf("Usage: must provide lower and upper range limits as arguments"))
+		panic(fmt.Sprintf("Usage: must provide lower and upper range limits and number of cores as arguments"))
 	}
 
 	if lower, err = strconv.ParseInt(os.Args[1], 10, 64); err != nil {
