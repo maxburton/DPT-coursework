@@ -1,11 +1,11 @@
-// totientRange.go - Sequential Euler Totient Function (Go Version)
+// totientRangePar.go - Parallel Euler Totient Function (Go Version)
 // compile: go build
-// run:     totientRange lower_num upper_num
+// run:     totientRangePar lower_num upper_num num_threads
 
-// Phil Trinder    30/8/2018
+// Author: Max Kirker Burton 2260452b   07/11/2019
 
 // This program calculates the sum of the totients between a lower and an
-// upper limit
+// upper limit, and can be run with several Goroutines
 //
 // Each function has an executable Haskell specification
 //
@@ -87,7 +87,7 @@ func sumTotient(lower, upper, cores int64) int64 {
 
 		var eupper int64
 		if i+1 == goroutines {
-			eupper = upper
+			eupper = upper + 1 // plus 1 to include final number
 		} else {
 			eupper = lower + (chunkSize * (i + 1))
 		}

@@ -1,12 +1,13 @@
-// TotientRange.c - Sequential Euler Totient Function (C Version)
-// compile: gcc -Wall -O -o TotientRange TotientRange.c
-// run:     ./TotientRange lower_num upper_num
+// TotientRangePar.c - Parallel Euler Totient Function (C Version)
+// compile: gcc -Wall -O -o TotientRangePar TotientRangePar.c
+// run:     ./TotientRangePar lower_num upper_num num_threads(optional)
 
-// Greg Michaelson 14/10/2003
-// Patrick Maier   29/01/2010 [enforced ANSI C compliance]
+// Author: Max Kirker Burton 2260452b     13/11/19
 
 // This program calculates the sum of the totients between a lower and an 
-// upper limit using C longs. It is based on earlier work by:
+// upper limit using C longs, and can be run with several Goroutines either set as an argument or
+// as an environment variable
+// It is based on earlier work by:
 // Phil Trinder, Nathan Charles, Hans-Wolfgang Loidl and Colin Runciman
 
 // The comments provide (executable) Haskell specifications of the functions
@@ -60,7 +61,7 @@ long sumTotient(long lower, long upper, int n_threads)
   long sum, i;
 
   sum = 0;
-  #pragma omp parallel for reduction(+: sum) num_threads(n_threads)
+  #pragma omp parallel for schedule(guided) reduction(+: sum) num_threads(n_threads)
     for (i = lower; i <= upper; i++)
       sum += euler(i);
   return sum;
