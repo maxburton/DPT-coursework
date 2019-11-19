@@ -1,5 +1,5 @@
 // TotientRangePar.c - Parallel Euler Totient Function (C Version)
-// compile: gcc -Wall -O -o TotientRangePar TotientRangePar.c
+// compile: gcc -Wall -O2 -o TotientRangePar TotientRangePar.c
 // run:     ./TotientRangePar lower_num upper_num num_threads(optional)
 
 // Author: Max Kirker Burton 2260452b     13/11/19
@@ -58,12 +58,13 @@ long euler(long n)
 
 long sumTotient(long lower, long upper, int n_threads)
 {
-  long sum, i;
-
-  sum = 0;
+  long sum = 0, i;
+  
   #pragma omp parallel for schedule(guided) reduction(+: sum) num_threads(n_threads)
-    for (i = lower; i <= upper; i++)
+    for (i = lower; i <= upper; i++){
       sum += euler(i);
+    }
+
   return sum;
 }
 
