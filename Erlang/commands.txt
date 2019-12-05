@@ -1,0 +1,8 @@
+c(totientRangeNWorkers).
+totientRangeNWorkers:startServer().
+server ! {range, 1, 4000, 4}.
+
+c(totientRange2Workers).
+totientRange2Workers:startServer().
+server ! {range, 1, 4000}.
+

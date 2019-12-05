@@ -7,11 +7,12 @@
      totientWorker/0
 	]).
 
-%% TotientRange.erl - Sequential Euler Totient Function (Erlang Version)
-%% compile from the shell: >c(totientrange).
-%% run from the shell:     >totientrange:sumTotient(1,1000).
+%% TotientRange2Workers.erl - Parellel Euler Totient Function (Erlang Version)
+%% compile from the shell: >c(totientRange2Workers).
+%% run from the shell:     >totientRange2Workers:startServer().
+%%                         >server ! {range, x, y}.
 
-%% Phil Trinder 20/10/2018
+%% Max Kirker Burton 2260452b 20/10/2018
 
 %% This program calculates the sum of the totients between a lower and an 
 %% upper limit. It is based on earlier work by: Nathan Charles, 
