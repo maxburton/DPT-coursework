@@ -1,4 +1,4 @@
--module(totientRangeNWorkersReliable).
+-module(totientrangeNWorkersReliable).
 -export([hcf/2,
  	 relprime/2,
 	 euler/1,
@@ -6,16 +6,16 @@
      workerNames/1,
      workerName/1,
      registerWorker/3,
-     server/5,
+     server/7,
      totientWorker/0,
      watcher/3,
      workerChaos/2,
      testRobust/2
 	]).
 
-%% TotientRangeNWorkersReliable.erl - Parallel & Reliable Euler Totient Function (Erlang Version)
-%% compile from the shell: >c(totientRangeNWorkersReliable).
-%% run from the shell:     >totientRangeNWorkersReliable:startServer().
+%% totientrangeNWorkersReliable.erl - Parallel & Reliable Euler Totient Function (Erlang Version)
+%% compile from the shell: >c(totientrangeNWorkersReliable).
+%% run from the shell:     >totientrangeNWorkersReliable:startServer().
 %%                         >server ! {range, x, y, N}.
 
 %% Max Kirker Burton 2260452b
@@ -64,9 +64,11 @@ printElapsed(S,US) ->
   end,
   io:format("Time taken in Secs, MicroSecs ~p ~p~n",[S3-S,US3-US]).
 
+%% Generate a worker name with a given number
 workerName(Num) ->
     list_to_atom( "worker" ++ integer_to_list( Num )).
 
+%% Recursively generate worker names from a sequential list
 workerNames([]) ->
     0;
 workerNames(Range) ->
@@ -75,50 +77,57 @@ workerNames(Range) ->
     server ! {names, WorkerName, Head},
     workerNames(Rest).
 
+%% register a worker, then pass a message to it
 registerWorker(WorkerNum, Lower, Upper) ->
-    register(WorkerNum, spawn_link(totientRangeNWorkersReliable, totientWorker, [])),
+    register(WorkerNum, spawn_link(totientrangeNWorkersReliable, totientWorker, [])),
     WorkerNum ! {range, Lower, Upper}.
 
-server(Total, Count, Lower, Upper, N_workers) ->
-    {_, S, US} = os:timestamp(),
+%% We pass in these variables to keep their value over successive receive calls
+server(Total, Count, Lower, Upper, N_workers, S, US) ->
     receive
+        %% Check if all workers have finished, otherwise continue
         {finished, Sum, Pid} when Count < (N_workers-1) ->
             io:format("Server: Received Sum: ~p~n", [Sum]),
             Pid ! finished,
-            server(Total+Sum, Count+1, Lower, Upper, N_workers);
+            server(Total+Sum, Count+1, Lower, Upper, N_workers, S, US);
         {finished, Sum, Pid} ->
             io:format("Server: Received Sum: ~p~n", [Sum]),
             io:format("Server: Sum of totients: ~p~n", [Total+Sum]),
             Pid ! finished,
             printElapsed(S,US);
-        {names, WorkerNum, Num} when Num == N_workers ->
-            LocalLower = 1 + Lower + trunc(((Upper - Lower)/N_workers) * (Num - 1)),
-            LocalUpper = Upper,
-            spawn(totientRangeNWorkersReliable, watcher, [WorkerNum, LocalLower, LocalUpper]),
-            server(Total, Count, Lower, Upper, N_workers);
+        %% if this is the first worker, start from Lower
         {names, WorkerNum, Num} when Num == 1 ->
             LocalLower = Lower,
             LocalUpper = Lower + trunc(((Upper - Lower)/N_workers) * (Num)),
-            spawn(totientRangeNWorkersReliable, watcher, [WorkerNum, LocalLower, LocalUpper]),
-            server(Total, Count, Lower, Upper, N_workers);
+            spawn(totientrangeNWorkersReliable, watcher, [WorkerNum, LocalLower, LocalUpper]),
+            server(Total, Count, Lower, Upper, N_workers, S, US);
+        %% if this is the last worker, set the Upper limit
+        {names, WorkerNum, Num} when Num == N_workers ->
+            LocalLower = 1 + Lower + trunc(((Upper - Lower)/N_workers) * (Num - 1)),
+            LocalUpper = Upper,
+            spawn(totientrangeNWorkersReliable, watcher, [WorkerNum, LocalLower, LocalUpper]),
+            server(Total, Count, Lower, Upper, N_workers, S, US);
+        %% otherwise calculate an equal range
         {names, WorkerNum, Num} ->
             LocalLower = 1 + Lower + trunc(((Upper - Lower)/N_workers) * (Num - 1)),
             LocalUpper = Lower + trunc(((Upper - Lower)/N_workers) * (Num)),
-            spawn(totientRangeNWorkersReliable, watcher, [WorkerNum, LocalLower, LocalUpper]),
-            server(Total, Count, Lower, Upper, N_workers);
+            spawn(totientrangeNWorkersReliable, watcher, [WorkerNum, LocalLower, LocalUpper]),
+            server(Total, Count, Lower, Upper, N_workers, S, US);
         {range, L, U, N} ->
+            {_, Sec, USec} = os:timestamp(),
             Range = lists:seq(1, N),
             workerNames(Range),
-            server(Total, Count, L, U, N)
+            server(Total, Count, L, U, N, Sec, USec)
     end.
 
+%% If an exit message is received and the worker had not completed, trap it and respawn the linked worker
 watcher(WorkerNum, LocalLower, LocalUpper) ->
     process_flag(trap_exit, true),
     registerWorker(WorkerNum, LocalLower, LocalUpper),
     io:format("Watcher: Watching Worker ~p~n", [WorkerNum]),
     receive
         Msg -> 
-            {Message, Pid, Reason} = Msg,
+            {_Message, _Pid, Reason} = Msg,
             if 
                 Reason == chaos ->
                     watcher(WorkerNum, LocalLower, LocalUpper);
@@ -127,6 +136,7 @@ watcher(WorkerNum, LocalLower, LocalUpper) ->
             end
     end.
 
+%% calculate sumTotient on a subset of the dataset
 totientWorker() ->
     receive
         finished ->
@@ -170,4 +180,4 @@ testRobust(NWorkers, NVictims) ->
 
 %%start the server process
 startServer() ->
-    register(server, spawn(totientRangeNWorkersReliable, server, [0, 0, 0, 0, 0])).
+    register(server, spawn(totientrangeNWorkersReliable, server, [0, 0, 0, 0, 0, 0, 0])).

@@ -1,4 +1,4 @@
--module(totientParallel1).
+-module(totientRange).
 -export([hcf/2,
  	 relprime/2,
 	 euler/1,

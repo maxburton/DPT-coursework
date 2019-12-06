@@ -1,17 +1,17 @@
--module(totientRangeNWorkers).
+-module(totientrangeNWorkers).
 -export([hcf/2,
  	 relprime/2,
 	 euler/1,
      startServer/0,
      workerName/1,
      registerWorker/3,
-     server/5,
+     server/7,
      totientWorker/0
 	]).
 
-%% TotientRangeNWorkers.erl - Parallel Euler Totient Function (Erlang Version)
-%% compile from the shell: >c(totientRangeNWorkers).
-%% run from the shell:     >totientRangeNWorkers:startServer().
+%% totientrangeNWorkers.erl - Parallel Euler Totient Function (Erlang Version)
+%% compile from the shell: >c(totientrangeNWorkers).
+%% run from the shell:     >totientrangeNWorkers:startServer().
 %%                         >server ! {range, x, y, N}.
 
 %% Max Kirker Burton 2260452b
@@ -72,42 +72,48 @@ workerNames(Range) ->
     workerNames(Rest).
 
 registerWorker(WorkerNum, Lower, Upper) ->
-    register(WorkerNum, spawn(totientRangeNWorkers, totientWorker, [])),
+    register(WorkerNum, spawn(totientrangeNWorkers, totientWorker, [])),
     WorkerNum ! {range, Lower, Upper}.
 
-server(Total, Count, Lower, Upper, N_workers) ->
-    {_, S, US} = os:timestamp(),
+%% We pass in these variables to keep their value over successive receive calls
+server(Total, Count, Lower, Upper, N_workers, S, US) ->
     receive
+        %% Check if all workers have finished, otherwise continue
         {finished, Sum, Pid} when Count < (N_workers-1) ->
             io:format("Server: Received Sum: ~p~n", [Sum]),
             Pid ! finished,
-            server(Total+Sum, Count+1, Lower, Upper, N_workers);
+            server(Total+Sum, Count+1, Lower, Upper, N_workers, S, US);
         {finished, Sum, Pid} ->
             io:format("Server: Received Sum: ~p~n", [Sum]),
             io:format("Server: Sum of totients: ~p~n", [Total+Sum]),
             Pid ! finished,
             printElapsed(S,US);
-        {names, WorkerNum, Num} when Num == N_workers ->
-            LocalLower = 1 + Lower + trunc(((Upper - Lower)/N_workers) * (Num - 1)),
-            LocalUpper = Upper,
-            registerWorker(WorkerNum, LocalLower, LocalUpper),
-            server(Total, Count, Lower, Upper, N_workers);
+        %% if this is the first worker, start from Lower
         {names, WorkerNum, Num} when Num == 1 ->
             LocalLower = Lower,
             LocalUpper = Lower + trunc(((Upper - Lower)/N_workers) * (Num)),
             registerWorker(WorkerNum, LocalLower, LocalUpper),
-            server(Total, Count, Lower, Upper, N_workers);
+            server(Total, Count, Lower, Upper, N_workers, S, US);
+        %% if this is the last worker, set the Upper limit
+        {names, WorkerNum, Num} when Num == N_workers ->
+            LocalLower = 1 + Lower + trunc(((Upper - Lower)/N_workers) * (Num - 1)),
+            LocalUpper = Upper,
+            registerWorker(WorkerNum, LocalLower, LocalUpper),
+            server(Total, Count, Lower, Upper, N_workers, S, US);
+        %% otherwise calculate an equal range
         {names, WorkerNum, Num} ->
             LocalLower = 1 + Lower + trunc(((Upper - Lower)/N_workers) * (Num - 1)),
             LocalUpper = Lower + trunc(((Upper - Lower)/N_workers) * (Num)),
             registerWorker(WorkerNum, LocalLower, LocalUpper),
-            server(Total, Count, Lower, Upper, N_workers);
+            server(Total, Count, Lower, Upper, N_workers, S, US);
         {range, L, U, N} ->
+            {_, Sec, USec} = os:timestamp(),
             Range = lists:seq(1, N),
             workerNames(Range),
-            server(Total, Count, L, U, N)
+            server(Total, Count, L, U, N, Sec, USec)
     end.
 
+%% calculate sumTotient on a subset of the dataset
 totientWorker() ->
     receive
         finished ->
@@ -124,4 +130,4 @@ totientWorker() ->
 
 %%start the server process
 startServer() ->
-    register(server, spawn(totientRangeNWorkers, server, [0, 0, 0, 0, 0])).
+    register(server, spawn(totientrangeNWorkers, server, [0, 0, 0, 0, 0, 0, 0])).

@@ -1,15 +1,15 @@
--module(totientRange2Workers).
+-module(totientrange2Workers).
 -export([hcf/2,
  	 relprime/2,
 	 euler/1,
      startServer/0,
-     server/2,
+     server/4,
      totientWorker/0
 	]).
 
-%% TotientRange2Workers.erl - Parellel Euler Totient Function (Erlang Version)
-%% compile from the shell: >c(totientRange2Workers).
-%% run from the shell:     >totientRange2Workers:startServer().
+%% totientrange2Workers.erl - Parellel Euler Totient Function (Erlang Version)
+%% compile from the shell: >c(totientrange2Workers).
+%% run from the shell:     >totientrange2Workers:startServer().
 %%                         >server ! {range, x, y}.
 
 %% Max Kirker Burton 2260452b
@@ -58,12 +58,13 @@ printElapsed(S,US) ->
   end,
   io:format("Time taken in Secs, MicroSecs ~p ~p~n",[S3-S,US3-US]).
 
-server(Total, Count) ->
-    {_, S, US} = os:timestamp(),
+%% We pass in these variables to keep their value over successive receive calls
+server(Total, Count, S, US) ->
     receive
+        %% Check if all workers have finished, otherwise continue
         {finished, Sum} when Count < 1 ->
             io:format("Server: Received Sum: ~p~n", [Sum]),
-            server(Total+Sum, Count+1);
+            server(Total+Sum, Count+1, S, US);
         {finished, Sum} ->
             io:format("Server: Received Sum: ~p~n", [Sum]),
             io:format("Server: Sum of totients: ~p~n", [Total+Sum]),
@@ -71,13 +72,15 @@ server(Total, Count) ->
             worker2 ! finished,
             printElapsed(S,US);
         {range, Lower, Upper} ->
-            register(worker1, spawn(totientRange2Workers, totientWorker, [])),
+            {_, Sec, USec} = os:timestamp(),
+            register(worker1, spawn(totientrange2Workers, totientWorker, [])),
             worker1 ! {range, Lower, trunc(Upper/2)},
-            register(worker2, spawn(totientRange2Workers, totientWorker, [])),
+            register(worker2, spawn(totientrange2Workers, totientWorker, [])),
             worker2 ! {range, trunc(Upper/2 + 1), Upper},
-            server(Total, Count)
+            server(Total, Count, Sec, USec)
     end.
 
+%% calculate sumTotient on a subset of the dataset
 totientWorker() ->
     receive
         finished ->
@@ -93,4 +96,4 @@ totientWorker() ->
 
 %%start the server process
 startServer() ->
-    register(server, spawn(totientRange2Workers, server, [0, 0])).
+    register(server, spawn(totientrange2Workers, server, [0, 0, 0, 0])).
