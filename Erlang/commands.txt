@@ -1,10 +1,10 @@
 c(totientrangeNWorkers).
 totientrangeNWorkers:startServer().
-server ! {range, 1, 15000, 24}.
+server ! {range, 1, 15000, 32}.
 
 c(totientrange2Workers).
 totientrange2Workers:startServer().
-server ! {range, 1, 4000}.
+server ! {range, 1, 15000}.
 
 c(totientrangeNWorkersReliable).
 totientrangeNWorkersReliable:testRobust(4,3).
