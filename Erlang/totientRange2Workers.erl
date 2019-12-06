@@ -12,7 +12,7 @@
 %% run from the shell:     >totientRange2Workers:startServer().
 %%                         >server ! {range, x, y}.
 
-%% Max Kirker Burton 2260452b 20/10/2018
+%% Max Kirker Burton 2260452b
 
 %% This program calculates the sum of the totients between a lower and an 
 %% upper limit. It is based on earlier work by: Nathan Charles, 
@@ -65,6 +65,7 @@ server(Total, Count) ->
             io:format("Server: Received Sum: ~p~n", [Sum]),
             server(Total+Sum, Count+1);
         {finished, Sum} ->
+            io:format("Server: Received Sum: ~p~n", [Sum]),
             io:format("Server: Sum of totients: ~p~n", [Total+Sum]),
             worker1 ! finished,
             worker2 ! finished,
